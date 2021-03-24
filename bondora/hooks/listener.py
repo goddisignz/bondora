@@ -51,9 +51,9 @@ def responder():
     response = Response(status=200)
     try:
         loan_data = request.get_json(force=True, silent=True)
-        trading.buy_red_loans(loan_data)
+        trading.buy_red_loan(loan_data)
         trading.buy_green_loan(loan_data)
-        with open(PATH_DATA + '/data_{}.json'.format(1),
+        with open(PATH_DATA + '/data_{}.json'.format(USER_NAME[0:5]),
                   'w', encoding='utf-8') as outfile:
             json.dump(loan_data, outfile, ensure_ascii=False, indent=2)
 
