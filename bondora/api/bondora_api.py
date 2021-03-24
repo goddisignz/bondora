@@ -23,7 +23,8 @@ class BondoraApi:
                  url_eventlog=api.urls.URL_BONDORA_EVENTLOG,
                  url_sm=api.urls.URL_BONDORA_SM,
                  url_loan_parts=api.urls.URL_LOAN_PARTS,
-                 url_buy_sm=api.urls.URL_BONDORA_BUY_SM):
+                 url_buy_sm=api.urls.URL_BONDORA_BUY_SM,
+                 url_sell_sm=api.urls.URL_BONDORA_SELL_SM):
         self.user = user
         self.url_api = url_api
         self.url_balance = url_balance
@@ -32,6 +33,7 @@ class BondoraApi:
         self.url_sm = url_sm
         self.url_loan_parts = url_loan_parts
         self.url_buy_sm = url_buy_sm
+        self.url_sell_sm = url_sell_sm
         self.balance = None
         self.investments = None
         self.eventlog = None
@@ -249,6 +251,49 @@ class BondoraApi:
             Response of server to the request.
 
         """
-        json_ids = json.dumps({'ItemIds': ids})
-        response = self.post(self.url_buy_sm, json_ids)
-        return response
+        try:
+            json_ids = json.dumps({'ItemIds': ids})
+            response = self.post(self.url_buy_sm, json_ids)
+            return response
+
+        except Exception as e:
+            logger.error(e)
+
+    def sell_on_secondarymarket(self, loans,
+                                cancel_on_payment=False,
+                                cancel_on_reschedule=False):
+        """
+        Sell loans on secondary market.
+
+        Parameters
+        ----------
+        loans : list
+            List of tuples (LoanPartId, DesiredDiscountRate) to sell.
+        cancel_on_payment : bool, optional
+            Allow to auto cancel the selling of loans
+            if they receive new repayments. The default is False.
+        cancel_on_reschedule : bool, optional
+            Allow to auto cancel the selling of loans
+            if they are rescheduled. The default is False.
+
+        Returns
+        -------
+        response : requests.Response object
+            Response of server to the request.
+
+        """
+        loans_ids_list = []
+        try:
+            # create list of dicts
+            for loan in loans:
+                loans_ids_list.append({'LoanPartId': loan[0],
+                                       'DesiredDiscountRate': loan[1]})
+            loans_dict = {'Items': loans_ids_list,
+                          'CancelItemOnPaymentReceived': cancel_on_payment,
+                          'CancelItemOnReschedule': cancel_on_reschedule}
+            json_loans_dict = json.dumps({'Items': loans_dict})
+            response = self.post(self.url_sell_sm, json_loans_dict)
+            return response
+
+        except Exception as e:
+            logger.error(e)
