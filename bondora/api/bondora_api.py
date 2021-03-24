@@ -20,14 +20,17 @@ class BondoraApi:
                  url_api=api.urls.URL_BONDORA_API,
                  url_balance=api.urls.URL_BONDORA_BALANCE,
                  url_investments=api.urls.URL_BONDORA_INVESTMENTS,
+                 url_eventlog=api.urls.URL_BONDORA_EVENTLOG,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM):
         self.user = user
         self.url_api = url_api
         self.url_balance = url_balance
         self.url_investments = url_investments
+        self.url_eventlog = url_eventlog
         self.url_buy_sm = url_buy_sm
         self.balance = None
         self.investments = None
+        self.eventlog = None
         self.retry = {}
         self.headers = {'User-Agent':
                         ('Mozilla/5.0 (X11; Linux x86_64) '
@@ -132,6 +135,13 @@ class BondoraApi:
         """
         Get list of investments.
 
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments:
+                Request information (see
+                https://api.bondora.com/doc/Api/GET-api-v1-account-investments?v=1).
+
         Returns
         -------
         None.
@@ -140,6 +150,28 @@ class BondoraApi:
         try:
             self.investments = self.get(self.url_investments,
                                         params=kwargs)['Payload']
+        except Exception as e:
+            logger.error(e)
+
+    def get_eventlog(self, **kwargs):
+        """
+        Get events that have been made with this application.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments:
+                Request information (see
+                https://api.bondora.com/doc/Api/GET-api-v1-eventlog?v=1).
+
+        Returns
+        -------
+        None.
+
+        """
+        try:
+            self.eventlog = self.get(self.url_eventlog,
+                                     params=kwargs)['Payload']
         except Exception as e:
             logger.error(e)
 
