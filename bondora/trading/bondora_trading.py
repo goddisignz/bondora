@@ -40,17 +40,21 @@ class BondoraTrading(BondoraApi):
         Returns
         -------
         None.
-
         """
         loan_selector = False
         today = datetime.now()
         try:
             # get payload
-            payload = loan['Payload']
+            if 'EventType' not in loan:
+                return None
+            else:
+                if loan['EventType'] not in ['secondmarket.published',
+                                             'secondmarket.updated']:
+                    return None
+                else:
+                    payload = loan['Payload']
 
             # check buying conditions
-            next_pm_date = date.fromisoformat(payload['NextPaymentDate'][:10])
-            pm_date_min = (today + timedelta(days=10)).date()
             loan_selector = False # define trading conditions here
 
             if loan_selector:
@@ -66,7 +70,6 @@ class BondoraTrading(BondoraApi):
                         str(payload['DesiredDiscountRate']) + '\n')
 
         except Exception as e:
-            print(e)
             logger.error(e)
 
     def buy_red_loan(self, loan):
@@ -87,7 +90,14 @@ class BondoraTrading(BondoraApi):
         today = datetime.now()
         try:
             # get payload
-            payload = loan['Payload']
+            if 'EventType' not in loan:
+                return None
+            else:
+                if loan['EventType'] not in ['secondmarket.published',
+                                             'secondmarket.updated']:
+                    return None
+                else:
+                    payload = loan['Payload']
 
             # check buying conditions
             loan_selector = False # define trading conditions here
@@ -103,5 +113,6 @@ class BondoraTrading(BondoraApi):
                         ' EUR in ' + payload['LoanPartId'] +
                         ' on the secondary market with discount ' +
                         str(payload['DesiredDiscountRate']) + '\n')
+
         except Exception as e:
             logger.error(e)
