@@ -21,16 +21,19 @@ class BondoraApi:
                  url_balance=api.urls.URL_BONDORA_BALANCE,
                  url_investments=api.urls.URL_BONDORA_INVESTMENTS,
                  url_eventlog=api.urls.URL_BONDORA_EVENTLOG,
+                 url_sm=api.urls.URL_BONDORA_SM,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM):
         self.user = user
         self.url_api = url_api
         self.url_balance = url_balance
         self.url_investments = url_investments
         self.url_eventlog = url_eventlog
+        self.url_sm = url_sm
         self.url_buy_sm = url_buy_sm
         self.balance = None
         self.investments = None
         self.eventlog = None
+        self.sm = None
         self.retry = {}
         self.headers = {'User-Agent':
                         ('Mozilla/5.0 (X11; Linux x86_64) '
@@ -126,8 +129,10 @@ class BondoraApi:
 
         """
         try:
-            balance = self.get(self.url_balance)['Payload']['TotalAvailable']
-            self.balance = float(balance)
+            balance = self.get(self.url_balance)
+            if 'Payload' not in balance:
+                return None
+            self.balance = float(balance['Payload']['TotalAvailable'])
         except Exception as e:
             logger.error(e)
 
@@ -148,8 +153,10 @@ class BondoraApi:
 
         """
         try:
-            self.investments = self.get(self.url_investments,
-                                        params=kwargs)['Payload']
+            investments = self.get(self.url_investments, params=kwargs)
+            if 'Payload' not in investments:
+                return None
+            self.investments = investments['Payload']
         except Exception as e:
             logger.error(e)
 
@@ -170,8 +177,34 @@ class BondoraApi:
 
         """
         try:
-            self.eventlog = self.get(self.url_eventlog,
-                                     params=kwargs)['Payload']
+            eventlog = self.get(self.url_eventlog, params=kwargs)
+            if 'Payload' not in eventlog:
+                return None
+            self.eventlog = eventlog['Payload']
+        except Exception as e:
+            logger.error(e)
+
+    def get_secondarymarket(self, **kwargs):
+        """
+        Get list of active secondary market items.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments:
+                Request information (see
+                https://api.bondora.com/doc/Api/GET-api-v1-secondarymarket?v=1).
+
+        Returns
+        -------
+        None.
+
+        """
+        try:
+            sm = self.get(self.url_sm, params=kwargs)
+            if 'Payload' not in sm:
+                return None
+            self.sm = sm['Payload']
         except Exception as e:
             logger.error(e)
 
