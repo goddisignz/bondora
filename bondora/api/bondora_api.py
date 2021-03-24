@@ -22,6 +22,7 @@ class BondoraApi:
                  url_investments=api.urls.URL_BONDORA_INVESTMENTS,
                  url_eventlog=api.urls.URL_BONDORA_EVENTLOG,
                  url_sm=api.urls.URL_BONDORA_SM,
+                 url_loan_parts=api.urls.URL_LOAN_PARTS,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM):
         self.user = user
         self.url_api = url_api
@@ -29,11 +30,13 @@ class BondoraApi:
         self.url_investments = url_investments
         self.url_eventlog = url_eventlog
         self.url_sm = url_sm
+        self.url_loan_parts = url_loan_parts
         self.url_buy_sm = url_buy_sm
         self.balance = None
         self.investments = None
         self.eventlog = None
         self.sm = None
+        self.loan_parts = None
         self.retry = {}
         self.headers = {'User-Agent':
                         ('Mozilla/5.0 (X11; Linux x86_64) '
@@ -73,7 +76,7 @@ class BondoraApi:
 
         return response
 
-    def get(self, url, params=None):
+    def get(self, url, params=None, data=None):
         """
         Make a GET request to the specified url.
 
@@ -205,6 +208,29 @@ class BondoraApi:
             if 'Payload' not in sm:
                 return None
             self.sm = sm['Payload']
+        except Exception as e:
+            logger.error(e)
+
+    def get_loanparts(self, ids):
+        """
+        Get loan part info.
+
+        Parameters
+        ----------
+        ids : list
+            List of loan part IDs.
+
+        Returns
+        -------
+        None.
+
+        """
+        try:
+            json_ids = json.dumps({'ItemIds': ids})
+            loan_parts = self.post(self.url_loan_parts, content=json_ids)
+            if 'Payload' not in loan_parts:
+                return None
+            self.loan_parts = loan_parts['Payload']
         except Exception as e:
             logger.error(e)
 
