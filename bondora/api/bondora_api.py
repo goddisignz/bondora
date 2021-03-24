@@ -18,12 +18,15 @@ class BondoraApi:
                  user,
                  url_api=api.urls.URL_BONDORA_API,
                  url_balance=api.urls.URL_BONDORA_BALANCE,
+                 url_investments=api.urls.URL_BONDORA_INVESTMENTS,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM):
         self.user = user
         self.url_api = url_api
         self.url_balance = url_balance
+        self.url_investments = url_investments
         self.url_buy_sm = url_buy_sm
         self.balance = None
+        self.investments = None
         self.headers = {'User-Agent':
                         ('Mozilla/5.0 (X11; Linux x86_64) '
                          'AppleWebKit/537.11 (KHTML, like Gecko) '
@@ -62,7 +65,7 @@ class BondoraApi:
 
         return response
 
-    def get(self, url, content=None):
+    def get(self, url, params=None):
         """
         Make a GET request to the specified url.
 
@@ -70,8 +73,8 @@ class BondoraApi:
         ----------
         url : str
             URL of the request.
-        content : dict
-            Content to send to the specified URL.
+        params : dict
+            Parameters to pass in URL.
 
         Returns
         -------
@@ -83,7 +86,8 @@ class BondoraApi:
         try:
             response = requests.get(self.url_api + '/{}'.format(url),
                                     headers=self.headers,
-                                    data=json.dumps(content))
+                                    params=params)
+
             # check if response ok
             if response.status_code == requests.codes.ok:
                 response_json = json.loads(response.content)
@@ -110,6 +114,21 @@ class BondoraApi:
         try:
             balance = self.get(self.url_balance)['Payload']['TotalAvailable']
             self.balance = float(balance)
+        except Exception as e:
+            logger.error(e)
+
+    def get_investments(self, **kwargs):
+        """
+        Get list of investments.
+
+        Returns
+        -------
+        None.
+
+        """
+        try:
+            self.investments = self.get(self.url_investments,
+                                        params=kwargs)['Payload']
         except Exception as e:
             logger.error(e)
 
