@@ -4,6 +4,7 @@
 import json
 import requests
 import urllib3
+import inspect
 import api.urls
 from datetime import date, datetime, timedelta
 from setup_logger import logger
@@ -27,6 +28,7 @@ class BondoraApi:
         self.url_buy_sm = url_buy_sm
         self.balance = None
         self.investments = None
+        self.retry = {}
         self.headers = {'User-Agent':
                         ('Mozilla/5.0 (X11; Linux x86_64) '
                          'AppleWebKit/537.11 (KHTML, like Gecko) '
@@ -96,6 +98,15 @@ class BondoraApi:
             else:
                 logger.error('Response status code: {}'
                              .format(response.status_code))
+                # if too many requests
+                if response.status_code == requests.codes.too_many_requests:
+                    # get wait time
+                    response_json = json.loads(response.content)
+                    wait_time = int(
+                        response_json['Errors'][0]['Details'].split()[2])
+                    # get caller name
+                    caller = inspect.stack()[1][3]
+                    self.retry[caller] = wait_time
 
         except Exception as e:
             logger.error(e)
