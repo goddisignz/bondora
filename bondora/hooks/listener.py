@@ -53,6 +53,7 @@ def responder():
         loan_data = request.get_json(force=True, silent=True)
         trading.buy_red_loan(loan_data)
         trading.buy_green_loan(loan_data)
+        # comment next three lines to avoid the saving of loan info
         with open(PATH_DATA + '/data_{}.json'.format(USER_NAME[0:5]),
                   'w', encoding='utf-8') as outfile:
             json.dump(loan_data, outfile, ensure_ascii=False, indent=2)
