@@ -21,6 +21,7 @@ class BondoraApi:
                  url_balance=api.urls.URL_BONDORA_BALANCE,
                  url_investments=api.urls.URL_BONDORA_INVESTMENTS,
                  url_eventlog=api.urls.URL_BONDORA_EVENTLOG,
+                 url_auctions=api.urls.URL_BONDORA_AUCTIONS,
                  url_sm=api.urls.URL_BONDORA_SM,
                  url_loan_parts=api.urls.URL_LOAN_PARTS,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM,
@@ -31,6 +32,7 @@ class BondoraApi:
         self.url_balance = url_balance
         self.url_investments = url_investments
         self.url_eventlog = url_eventlog
+        self.url_auctions = url_auctions
         self.url_sm = url_sm
         self.url_loan_parts = url_loan_parts
         self.url_buy_sm = url_buy_sm
@@ -188,6 +190,30 @@ class BondoraApi:
             if 'Payload' not in eventlog:
                 return None
             self.eventlog = eventlog['Payload']
+        except Exception as e:
+            logger.error(e)
+
+    def get_auctions(self, **kwargs):
+        """
+        Get list of active auctions.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments:
+                Request information (see
+                https://api.bondora.com/doc/Api/GET-api-v1-auctions?v=1).
+
+        Returns
+        -------
+        None.
+
+        """
+        try:
+            auctions = self.get(self.url_auctions, params=kwargs)
+            if 'Payload' not in auctions:
+                return None
+            self.auctions = auctions['Payload']
         except Exception as e:
             logger.error(e)
 
