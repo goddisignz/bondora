@@ -293,8 +293,7 @@ class BondoraApi:
             loans_dict = {'Items': loans_ids_list,
                           'CancelItemOnPaymentReceived': cancel_on_payment,
                           'CancelItemOnReschedule': cancel_on_reschedule}
-            json_loans_dict = json.dumps({'Items': loans_dict})
-            response = self.post(self.url_sell_sm, json_loans_dict)
+            response = self.post(self.url_sell_sm, loans_dict)
             return response
 
         except Exception as e:
