@@ -245,7 +245,7 @@ class BondoraApi:
         Parameters
         ----------
         ids : list
-            List of loans IDs to buy.
+            List of secondary market item IDs to buy.
 
         Returns
         -------
@@ -254,8 +254,7 @@ class BondoraApi:
 
         """
         try:
-            json_ids = json.dumps({'ItemIds': ids})
-            response = self.post(self.url_buy_sm, json_ids)
+            response = self.post(self.url_buy_sm, {'ItemIds': ids})
             return response
 
         except Exception as e:
