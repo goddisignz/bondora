@@ -24,7 +24,8 @@ class BondoraApi:
                  url_sm=api.urls.URL_BONDORA_SM,
                  url_loan_parts=api.urls.URL_LOAN_PARTS,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM,
-                 url_sell_sm=api.urls.URL_BONDORA_SELL_SM):
+                 url_sell_sm=api.urls.URL_BONDORA_SELL_SM,
+                 url_cancel_sm=api.urls.URL_BONDORA_CANCEL_SM):
         self.user = user
         self.url_api = url_api
         self.url_balance = url_balance
@@ -34,6 +35,7 @@ class BondoraApi:
         self.url_loan_parts = url_loan_parts
         self.url_buy_sm = url_buy_sm
         self.url_sell_sm = url_sell_sm
+        self.url_cancel_sm = url_cancel_sm
         self.balance = None
         self.investments = None
         self.eventlog = None
@@ -293,6 +295,29 @@ class BondoraApi:
                           'CancelItemOnReschedule': cancel_on_reschedule}
             json_loans_dict = json.dumps({'Items': loans_dict})
             response = self.post(self.url_sell_sm, json_loans_dict)
+            return response
+
+        except Exception as e:
+            logger.error(e)
+
+    def cancel_on_secondarymarket(self, ids):
+        """
+        Sell loans on secondary market.
+
+        Parameters
+        ----------
+        ids : list
+            List of Secondary market item IDs to cancel.
+
+        Returns
+        -------
+        response : requests.Response object
+            Response of server to the request.
+
+        """
+        try:
+            json_ids = json.dumps({'ItemIds': ids})
+            response = self.post(self.url_cancel_sm, json_ids)
             return response
 
         except Exception as e:
