@@ -306,7 +306,7 @@ class BondoraApi:
         Parameters
         ----------
         ids : list
-            List of Secondary market item IDs to cancel.
+            List of secondary market item IDs to cancel.
 
         Returns
         -------
@@ -315,8 +315,7 @@ class BondoraApi:
 
         """
         try:
-            json_ids = json.dumps({'ItemIds': ids})
-            response = self.post(self.url_cancel_sm, json_ids)
+            response = self.post(self.url_cancel_sm, {'ItemIds': ids})
             return response
 
         except Exception as e:
