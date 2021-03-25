@@ -22,6 +22,7 @@ class BondoraApi:
                  url_investments=api.urls.URL_BONDORA_INVESTMENTS,
                  url_eventlog=api.urls.URL_BONDORA_EVENTLOG,
                  url_auctions=api.urls.URL_BONDORA_AUCTIONS,
+                 url_bid_auction=api.urls.URL_BONDORA_BID_AUCTION,
                  url_sm=api.urls.URL_BONDORA_SM,
                  url_loan_parts=api.urls.URL_LOAN_PARTS,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM,
@@ -33,6 +34,7 @@ class BondoraApi:
         self.url_investments = url_investments
         self.url_eventlog = url_eventlog
         self.url_auctions = url_auctions
+        self.url_bid_auction = url_bid_auction
         self.url_sm = url_sm
         self.url_loan_parts = url_loan_parts
         self.url_buy_sm = url_buy_sm
@@ -214,6 +216,37 @@ class BondoraApi:
             if 'Payload' not in auctions:
                 return None
             self.auctions = auctions['Payload']
+        except Exception as e:
+            logger.error(e)
+
+    def bid_on_auction(self, ids, amount):
+        """
+        Make bid into auctions by auction IDs.
+
+        Parameters
+        ----------
+        ids : list
+            List of auction IDs to bid.
+        amount : int
+            Amount to bid.
+
+        Returns
+        -------
+        response : requests.Response object
+            Response of server to the request.
+
+        """
+        auctions_ids_list = []
+        try:
+            # create list of dicts
+            for auction_id in ids:
+                auctions_ids_list.append({'AuctionId': auction_id,
+                                          'Amount': amount,
+                                          'MinAmount': 1})
+            response = self.post(self.url_bid_auction, {'Bids':
+                                                        auctions_ids_list})
+            return response
+
         except Exception as e:
             logger.error(e)
 
