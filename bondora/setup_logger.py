@@ -4,7 +4,7 @@
 import sys
 import logging
 
-path_logs = 'autotrader.log'
+PATH_LOGS = '/var/www/flask/bondora/bondora.log'
 
 class Logger():
     """Logger class."""
@@ -34,4 +34,4 @@ class Logger():
             self.logger.error(error)
 
 
-logger = Logger(path_logs).logger
+logger = Logger(PATH_LOGS).logger
