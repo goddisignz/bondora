@@ -155,3 +155,50 @@ class BondoraTrading(BondoraApi):
 
         except Exception as e:
             logger.error(e)
+
+    def cancel_sm_offers(self, **kwargs):
+        """
+        Cancel selling of own loans offered on secondary market.
+
+        Loans for canceling can be specified by the conditions defined
+        in `kwargs`. See the full list of possible conditions at:
+        https://api.bondora.com/doc/Api/GET-api-v1-secondarymarket?v=1
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments:
+                Loans conditions to cancel.
+
+        Returns
+        -------
+        None.
+
+        """
+        # wait 1 second before proceed
+        time.sleep(1)
+
+        # select only own loans offered on secondary market
+        if isinstance(kwargs, dict):
+            kwargs['ShowMyItems'] = True
+        else:
+            kwargs = {'ShowMyItems': True}
+        self.get_secondarymarket(**kwargs)
+
+        # get list of secondary market item IDs
+        ids = []
+        if self.sm:
+            for loan_on_sm in self.sm:
+                try:
+                    ids.append(loan_on_sm['Id'])
+                except Exception as e:
+                    logger.error(e)
+        else:
+            if self.retry:
+                if 'get_secondarymarket' in self.retry:
+                    logger.warning('Too many requests. Retry after {} s.'
+                                   .format(self.retry['get_secondarymarket']))
+                    return None
+            logger.warning('No loans satisfying provided conditions '
+                           'and offered for selling were found.')
+            return None
