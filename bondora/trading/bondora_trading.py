@@ -5,6 +5,7 @@ import os
 import sys
 import inspect
 import urllib3
+import time
 from datetime import date, datetime, timedelta
 from setup_logger import logger
 
@@ -27,6 +28,44 @@ class BondoraTrading(BondoraApi):
     def __init__(self, user):
         self.user = user
         BondoraApi.__init__(self, self.user)
+
+    def bid_loan(self, auction):
+        """
+        Make bid into specified auction.
+
+        Parameters
+        ----------
+        hook : dict
+            Loan related data with summary, collection process, and schedules.
+
+        Returns
+        -------
+        None.
+
+        """
+        loan_selector = False
+        try:
+            # get payload
+            if 'EventType' not in auction:
+                return None
+            else:
+                if auction['EventType'] != 'auction.published':
+                    return None
+                else:
+                    payload = auction['Payload']
+
+            if loan_selector:
+                self.bid_on_auction([payload['AuctionId']], 5)
+                today = datetime.now()
+                with open(PATH_DATA + '/bid_{}.log'.format(
+                        self.user[0:5]), 'a') as outfile:
+                    outfile.write(
+                        (today + timedelta(seconds=0*60*60)
+                         ).strftime(
+                             '%d.%m.%Y %H:%M:%S') + ': Try to invest 5 EUR\n')
+
+        except Exception as e:
+            logger.error(e)
 
     def buy_green_loan(self, loan):
         """
