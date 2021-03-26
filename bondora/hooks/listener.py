@@ -26,13 +26,13 @@ try:
     config = configparser.ConfigParser()
     config.read_file(open(PATH_SETTINGS))
 
-    USER_NAME = config.get('BONDORA', 'USER2')
+    TOKEN = config.get('BONDORA', 'TOKEN')
 
 except Exception as e:
     logger.critical(e)
     sys.exit(-1)
 
-trading = BondoraTrading(USER_NAME)
+trading = BondoraTrading(TOKEN)
 
 app = Flask(__name__)
 
