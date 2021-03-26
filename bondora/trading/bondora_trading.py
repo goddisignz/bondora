@@ -202,3 +202,88 @@ class BondoraTrading(BondoraApi):
             logger.warning('No loans satisfying provided conditions '
                            'and offered for selling were found.')
             return None
+
+    def place_sm_offers(self, max_price, min_price=None,
+                        days_before_payment=2, **kwargs):
+        """
+        Place loans for selling on secondary market.
+
+        Loans for selling can be specified by the conditions defined
+        in `kwargs`. See the full list of possible conditions at:
+        https://api.bondora.com/doc/Api/GET-api-v1-account-investments?v=1
+        If `min_price` is not specified, the selling price will be `max_price`.
+        Otherwise, the selling price will be reduced depending on how many
+        days remain between today and the next payment day.
+
+        Parameters
+        ----------
+        max_price : int
+            Maximal price to sell loan.
+        min_price : int, optional
+            Minimal price to sell loan. The default is None.
+        days_before_payment : int, optional
+            Latest selling date of loans before the next payment.
+            The default is 2.
+        **kwargs : dict
+            Keyword arguments:
+                Loans conditions to select for selling.
+
+        Returns
+        -------
+        None.
+
+        """
+        # wait 1 second before proceed
+        time.sleep(1)
+
+        price = max_price
+        self.get_investments(**kwargs)
+
+        # calculate latest selling date of loans before the next payment
+        if min_price:
+            latest_sell_date = date.today() + timedelta(
+                days=days_before_payment)
+
+        # get list of loan parts IDs and selling prices
+        part_ids_prices = []
+        if self.investments:
+            for investment in self.investments:
+                try:
+                    # calculate selling price
+                    if min_price:
+                        next_payment_date = datetime.strptime(
+                            investment['NextPaymentDate'],
+                            '%Y-%m-%dT00:00:00').date()
+                        price = min_price + (next_payment_date -
+                                             latest_sell_date).days
+                        if price > max_price:
+                            price = max_price
+                        elif price < min_price:
+                            price = min_price
+                    part_ids_prices.append((investment['LoanPartId'], price))
+                except Exception as e:
+                    print(e)
+        else:
+            if self.retry:
+                if 'get_investments' in self.retry:
+                    logger.warning('Too many requests. Retry after {} s.'
+                                   .format(self.retry['get_investments']))
+                    return None
+            logger.warning('No loans satisfying provided conditions '
+                           'were found.')
+            return None
+
+        # sell loans on secondary market
+        if part_ids_prices:
+            response = self.sell_on_secondarymarket(part_ids_prices)
+            if response.status_code == 202:
+                if len(part_ids_prices) == 1:
+                    logger.info('1 loan was successfully put on '
+                                'secondary market for selling.')
+                else:
+                    logger.info(' {} loans were successfully put on '
+                                'secondary market for selling.'
+                                .format(len(part_ids_prices)))
+            else:
+                logger.error('Error by putting loans on secondary market. '
+                             'Error code: {}'.format(response.status_code))
