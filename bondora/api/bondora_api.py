@@ -2,6 +2,7 @@
 """The file contains the class definition of Bondora API."""
 
 import json
+import time
 import requests
 import urllib3
 import inspect
@@ -16,7 +17,7 @@ class BondoraApi:
     """Class representation of Bondora API."""
 
     def __init__(self,
-                 user,
+                 token,
                  url_api=api.urls.URL_BONDORA_API,
                  url_balance=api.urls.URL_BONDORA_BALANCE,
                  url_investments=api.urls.URL_BONDORA_INVESTMENTS,
@@ -28,7 +29,7 @@ class BondoraApi:
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM,
                  url_sell_sm=api.urls.URL_BONDORA_SELL_SM,
                  url_cancel_sm=api.urls.URL_BONDORA_CANCEL_SM):
-        self.user = user
+        self.token = token
         self.url_api = url_api
         self.url_balance = url_balance
         self.url_investments = url_investments
@@ -55,7 +56,7 @@ class BondoraApi:
                         'Accept-Language': 'en-US,en;q=0.8',
                         'Connection': 'keep-alive',
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer {}'.format(self.user)}
+                        'Authorization': 'Bearer {}'.format(self.token)}
 
     def post(self, url, content):
         """
@@ -84,7 +85,7 @@ class BondoraApi:
 
         return response
 
-    def get(self, url, params=None, data=None):
+    def get(self, url, params=None, retry=False):
         """
         Make a GET request to the specified url.
 
@@ -92,8 +93,11 @@ class BondoraApi:
         ----------
         url : str
             URL of the request.
-        params : dict
-            Parameters to pass in URL.
+        params : dict, optional
+            Parameters to pass in URL. The default is None.
+        retry : bool, optional
+            Retry to execute the method, if too many requests.
+            The default is False.
 
         Returns
         -------
@@ -124,15 +128,26 @@ class BondoraApi:
                     # get caller name
                     caller = inspect.stack()[1][3]
                     self.retry[caller] = wait_time
+                    # second attempt, if required
+                    if retry:
+                        # wait second before proceed with the second attempt
+                        time.sleep(1.1)
+                        time.sleep(wait_time)
+                        self.get(url, params=params)
 
         except Exception as e:
             logger.error(e)
 
         return response_json
 
-    def get_balance(self):
+    def get_balance(self, retry):
         """
         Get balance of the account.
+
+        Parameters
+        ----------
+        retry : bool
+            Retry to execute the method, if too many requests.
 
         Returns
         -------
@@ -140,19 +155,21 @@ class BondoraApi:
 
         """
         try:
-            balance = self.get(self.url_balance)
+            balance = self.get(self.url_balance, retry=retry)
             if 'Payload' not in balance:
                 return None
             self.balance = float(balance['Payload']['TotalAvailable'])
         except Exception as e:
             logger.error(e)
 
-    def get_investments(self, **kwargs):
+    def get_investments(self, retry, **kwargs):
         """
         Get list of investments.
 
         Parameters
         ----------
+        retry : bool
+            Retry to execute the method, if too many requests.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -164,19 +181,22 @@ class BondoraApi:
 
         """
         try:
-            investments = self.get(self.url_investments, params=kwargs)
+            investments = self.get(self.url_investments, params=kwargs,
+                                   retry=retry)
             if 'Payload' not in investments:
                 return None
             self.investments = investments['Payload']
         except Exception as e:
             logger.error(e)
 
-    def get_eventlog(self, **kwargs):
+    def get_eventlog(self, retry, **kwargs):
         """
         Get events that have been made with this application.
 
         Parameters
         ----------
+        retry : bool
+            Retry to execute the method, if too many requests.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -188,19 +208,21 @@ class BondoraApi:
 
         """
         try:
-            eventlog = self.get(self.url_eventlog, params=kwargs)
+            eventlog = self.get(self.url_eventlog, params=kwargs, retry=retry)
             if 'Payload' not in eventlog:
                 return None
             self.eventlog = eventlog['Payload']
         except Exception as e:
             logger.error(e)
 
-    def get_auctions(self, **kwargs):
+    def get_auctions(self, retry, **kwargs):
         """
         Get list of active auctions.
 
         Parameters
         ----------
+        retry : bool
+            Retry to execute the method, if too many requests.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -212,7 +234,7 @@ class BondoraApi:
 
         """
         try:
-            auctions = self.get(self.url_auctions, params=kwargs)
+            auctions = self.get(self.url_auctions, params=kwargs, retry=retry)
             if 'Payload' not in auctions:
                 return None
             self.auctions = auctions['Payload']
@@ -250,12 +272,14 @@ class BondoraApi:
         except Exception as e:
             logger.error(e)
 
-    def get_secondarymarket(self, **kwargs):
+    def get_secondarymarket(self, retry, **kwargs):
         """
         Get list of active secondary market items.
 
         Parameters
         ----------
+        retry : bool
+            Retry to execute the method, if too many requests.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -267,7 +291,7 @@ class BondoraApi:
 
         """
         try:
-            sm = self.get(self.url_sm, params=kwargs)
+            sm = self.get(self.url_sm, params=kwargs, retry=retry)
             if 'Payload' not in sm:
                 return None
             self.sm = sm['Payload']
@@ -359,7 +383,7 @@ class BondoraApi:
 
     def cancel_on_secondarymarket(self, ids):
         """
-        Sell loans on secondary market.
+        Cancel sale of loans offered on secondary market.
 
         Parameters
         ----------
