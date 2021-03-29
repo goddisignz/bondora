@@ -4,6 +4,7 @@
 
 import os
 import sys
+import time
 import inspect
 import configparser
 
@@ -33,7 +34,7 @@ except Exception as e:
     sys.exit(-1)
 
 
-def offer_green_loans(token, max_price, min_price=None):
+def offer_green_loans(token, max_price, min_price=None, retry=True):
     """
     Offer current (green) loans on bondora's secondary market for selling.
 
@@ -45,6 +46,9 @@ def offer_green_loans(token, max_price, min_price=None):
         Maximal price to sell loan.
     min_price : int, optional
         Minimal price to sell loan. The default is None.
+    retry : bool, optional
+            Retry to execute the underlying methods, if too many requests.
+            The default is True.
 
     Returns
     -------
@@ -55,10 +59,14 @@ def offer_green_loans(token, max_price, min_price=None):
     bt = BondoraTrading(token)
 
     # calcel loans with current loans status offered on secondary market
-    bt.cancel_sm_offers(LoanStatusCode=2)
+    bt.cancel_sm_offers(retry=retry,
+                        LoanStatusCode=2)
 
     # place loans with current loans status on  secondary market for selling
-    bt.place_sm_offers(max_price, min_price, LoanStatusCode=2)
+    bt.place_sm_offers(max_price=max_price,
+                       min_price=min_price,
+                       retry=retry,
+                       LoanStatusCode=2)
 
 
 if __name__ == "__main__":
