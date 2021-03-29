@@ -79,9 +79,9 @@ class BondoraTrading(BondoraApi):
         Returns
         -------
         None.
+
         """
         loan_selector = False
-        today = datetime.now()
         try:
             # get payload
             if 'EventType' not in loan:
@@ -94,7 +94,30 @@ class BondoraTrading(BondoraApi):
                     payload = loan['Payload']
 
             # check buying conditions
-            loan_selector = False # define trading conditions here
+            today = datetime.now()
+            next_pm_date = date.fromisoformat(payload['NextPaymentDate'][:10])
+            pm_date_min = (today + timedelta(days=10)).date()
+            loan_selector = (
+                payload['NextPaymentNr'] == 1
+                and
+                payload['DesiredDiscountRate'] <= 1.0
+                and
+                payload['LoanStatusCode'] == 2
+                and
+                not payload['ReScheduledOn']
+                and
+                not payload['DebtOccuredOn']
+                and
+                not payload['DebtOccuredOnForSecondary']
+                and
+                payload['LateAmountTotal'] == 0.0
+                and
+                payload['Amount'] <= 5.0
+                and
+                payload['Interest'] > 12.0
+                and
+                next_pm_date > pm_date_min
+                )
 
             if loan_selector:
                 self.buy_on_secondarymarket([payload['Id']])
@@ -109,7 +132,8 @@ class BondoraTrading(BondoraApi):
                         str(payload['DesiredDiscountRate']) + '\n')
 
         except Exception as e:
-            logger.error(e)
+            #logger.error(e)
+            pass
 
     def buy_red_loan(self, loan):
         """
@@ -126,7 +150,6 @@ class BondoraTrading(BondoraApi):
 
         """
         loan_selector = False
-        today = datetime.now()
         try:
             # get payload
             if 'EventType' not in loan:
@@ -139,10 +162,15 @@ class BondoraTrading(BondoraApi):
                     payload = loan['Payload']
 
             # check buying conditions
-            loan_selector = False # define trading conditions here
+            loan_selector = (
+                payload['DesiredDiscountRate'] <= -94.0
+                and
+                payload['Price'] <= 5.0
+                )
 
             if loan_selector:
                 self.buy_on_secondarymarket([payload['Id']])
+                today = datetime.now()
                 with open(PATH_DATA + '/buy_red_{}.log'.format(
                         self.user[0:5]), 'a') as outfile:
                     outfile.write(
@@ -154,9 +182,10 @@ class BondoraTrading(BondoraApi):
                         str(payload['DesiredDiscountRate']) + '\n')
 
         except Exception as e:
-            logger.error(e)
+            #logger.error(e)
+            pass
 
-    def cancel_sm_offers(self, **kwargs):
+    def cancel_sm_offers(self, retry=False, **kwargs):
         """
         Cancel selling of own loans offered on secondary market.
 
@@ -166,6 +195,9 @@ class BondoraTrading(BondoraApi):
 
         Parameters
         ----------
+        retry : bool, optional
+            Retry to execute the method, if too many requests.
+            The default is False.
         **kwargs : dict
             Keyword arguments:
                 Loans conditions to cancel.
@@ -183,7 +215,7 @@ class BondoraTrading(BondoraApi):
             kwargs['ShowMyItems'] = True
         else:
             kwargs = {'ShowMyItems': True}
-        self.get_secondarymarket(**kwargs)
+        self.get_secondarymarket(retry, **kwargs)
 
         # get list of secondary market item IDs
         ids = []
@@ -203,8 +235,22 @@ class BondoraTrading(BondoraApi):
                            'and offered for selling were found.')
             return None
 
+        # cancel loans offered on secondary market
+        if ids:
+            response = self.cancel_on_secondarymarket(ids)
+            if response.status_code == 202:
+                if len(ids) == 1:
+                    logger.info('1 loan was successfully canceled on '
+                                'secondary market.')
+                else:
+                    logger.info(' {} loans were successfully canceled on '
+                                'secondary market.'.format(len(ids)))
+            else:
+                logger.error('Error by canceling loans on secondary market. '
+                             'Error code: {}'.format(response.status_code))
+
     def place_sm_offers(self, max_price, min_price=None,
-                        days_before_payment=2, **kwargs):
+                        days_before_payment=2, retry=False, **kwargs):
         """
         Place loans for selling on secondary market.
 
@@ -224,6 +270,9 @@ class BondoraTrading(BondoraApi):
         days_before_payment : int, optional
             Latest selling date of loans before the next payment.
             The default is 2.
+        retry : bool, optional
+            Retry to execute the method, if too many requests.
+            The default is False.
         **kwargs : dict
             Keyword arguments:
                 Loans conditions to select for selling.
@@ -237,7 +286,7 @@ class BondoraTrading(BondoraApi):
         time.sleep(1)
 
         price = max_price
-        self.get_investments(**kwargs)
+        self.get_investments(retry, **kwargs)
 
         # calculate latest selling date of loans before the next payment
         if min_price:
@@ -262,7 +311,7 @@ class BondoraTrading(BondoraApi):
                             price = min_price
                     part_ids_prices.append((investment['LoanPartId'], price))
                 except Exception as e:
-                    print(e)
+                    logger.error(e)
         else:
             if self.retry:
                 if 'get_investments' in self.retry:
@@ -284,6 +333,7 @@ class BondoraTrading(BondoraApi):
                     logger.info(' {} loans were successfully put on '
                                 'secondary market for selling.'
                                 .format(len(part_ids_prices)))
+
             else:
                 logger.error('Error by putting loans on secondary market. '
                              'Error code: {}'.format(response.status_code))
