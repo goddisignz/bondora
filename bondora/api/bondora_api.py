@@ -119,8 +119,6 @@ class BondoraApi:
             else:
                 # get caller name
                 caller = inspect.stack()[1][3]
-                logger.error('Response status code: {}, caller: {}'
-                             .format(response.status_code, caller))
                 # if too many requests
                 if response.status_code == requests.codes.too_many_requests:
                     # get wait time
@@ -128,12 +126,21 @@ class BondoraApi:
                     wait_time = int(
                         response_json['Errors'][0]['Details'].split()[2])
                     self.retry[caller] = wait_time
+                    logger.error('Response status code: {}, caller: {}, '
+                                 'retry after {} s.'
+                                 .format(response.status_code,
+                                         caller,
+                                         wait_time))
                     # second attempt, if required
                     if retry:
                         # wait second before proceed with the second attempt
                         time.sleep(1.1)
                         time.sleep(wait_time)
                         self.get(url, params=params)
+                # if not too many requests
+                else:
+                    logger.error('Response status code: {}, caller: {}'
+                                 .format(response.status_code, caller))
 
         except Exception as e:
             logger.error(e)
