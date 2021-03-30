@@ -117,16 +117,16 @@ class BondoraApi:
 
             # response is not ok
             else:
-                logger.error('Response status code: {}'
-                             .format(response.status_code))
+                # get caller name
+                caller = inspect.stack()[1][3]
+                logger.error('Response status code: {}, caller: {}'
+                             .format(response.status_code, caller))
                 # if too many requests
                 if response.status_code == requests.codes.too_many_requests:
                     # get wait time
                     response_json = json.loads(response.content)
                     wait_time = int(
                         response_json['Errors'][0]['Details'].split()[2])
-                    # get caller name
-                    caller = inspect.stack()[1][3]
                     self.retry[caller] = wait_time
                     # second attempt, if required
                     if retry:
