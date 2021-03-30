@@ -4,8 +4,10 @@
 
 import os
 import sys
+import time
 import inspect
 import configparser
+from random import randrange
 
 currentdir = os.path.dirname(
     os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -19,6 +21,9 @@ PATH_SETTINGS = '/var/www/flask/bondora/settings.cfg'
 
 # maximal number of failures
 threshold = 5
+
+# shift execution randomly between 0 and 60 seconds
+randomize = 60
 
 # read configuration
 try:
@@ -35,7 +40,7 @@ except Exception as e:
     sys.exit(0)
 
 
-def reset_webhooks(user, password, application_id, threshold):
+def reset_webhooks(user, password, application_id, threshold, randomize=0):
     """
     Reset webhooks, if the number of failures are above threshold.
 
@@ -49,12 +54,19 @@ def reset_webhooks(user, password, application_id, threshold):
         Application ID.
     threshold : int
             Threshold for maximal number of failures.
+    randomize : int, optional
+         Maximal number of seconds of random number generator for
+         a waiting before proceed. The default is 0.
 
     Returns
     -------
     None.
 
     """
+    # wait random number of seconds before proceed
+    if randomize > 0:
+        time.sleep(randrange(randomize))
+
     # initialize  object
     bw = BondoraApplication(user, password, application_id)
 
@@ -66,4 +78,5 @@ def reset_webhooks(user, password, application_id, threshold):
 
 
 if __name__ == "__main__":
-    reset_webhooks(USER_NAME, USER_PASSWORD, APPLICATION_ID, threshold)
+    reset_webhooks(USER_NAME, USER_PASSWORD, APPLICATION_ID,
+                   threshold, randomize)
