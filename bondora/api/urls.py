@@ -12,3 +12,6 @@ URL_LOAN_PARTS = 'api/v1/loanpart/list'
 URL_BONDORA_BUY_SM = 'api/v1/secondarymarket/buy'
 URL_BONDORA_SELL_SM = 'api/v1/secondarymarket/sell'
 URL_BONDORA_CANCEL_SM = 'api/v1/secondarymarket/cancel'
+
+URL_BONDORA_AUTH = 'https://api.bondora.com/Authentication/FormsAuthenticate'
+URL_BONDORA_BUTTON = 'https://api.bondora.com/Application/PingWebHook'
