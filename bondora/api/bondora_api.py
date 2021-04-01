@@ -125,22 +125,26 @@ class BondoraApi:
                     response_json = json.loads(response.content)
                     wait_time = int(
                         response_json['Errors'][0]['Details'].split()[2])
+                    # slightly increase wait time
+                    wait_time += 2
                     self.retry[caller] = wait_time
                     logger.error('Response status code: {}, caller: {}, '
                                  'retry after {} s.'
                                  .format(response.status_code,
                                          caller,
                                          wait_time))
-                    # second attempt, if required
-                    if retry:
-                        # wait second before proceed with the second attempt
-                        time.sleep(1.1)
-                        time.sleep(wait_time)
-                        self.get(url, params=params)
                 # if not too many requests
                 else:
+                    # set waite time to 60 s.
+                    wait_time = 60
                     logger.error('Response status code: {}, caller: {}'
                                  .format(response.status_code, caller))
+
+                # second attempt, if required
+                if retry:
+                    # wait before proceed with the second attempt
+                    time.sleep(wait_time)
+                    self.get(url, params=params)
 
         except Exception as e:
             logger.error(e)
