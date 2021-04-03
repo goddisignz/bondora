@@ -116,6 +116,8 @@ class BondoraTrading(BondoraApi):
                 and
                 payload['Interest'] > 12.0
                 and
+                payload['NrOfScheduledPayments'] > 36
+                and
                 next_pm_date > pm_date_min
                 )
 
