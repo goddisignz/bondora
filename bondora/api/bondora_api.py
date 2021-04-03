@@ -67,7 +67,7 @@ class BondoraApi:
         url : str
             URL of the request.
         content : dict
-            Content to send as a query string.
+            Content to send in a POST request.
 
         Returns
         -------
@@ -85,7 +85,7 @@ class BondoraApi:
 
         return response
 
-    def get(self, url, params=None, retry=False):
+    def get(self, url, content=None, params=None, retry=False):
         """
         Make a GET request to the specified url.
 
@@ -93,6 +93,8 @@ class BondoraApi:
         ----------
         url : str
             URL of the request.
+        content : dict, optional
+            Content to send in a GET request. The default is None.
         params : dict, optional
             Parameters to pass in URL. The default is None.
         retry : bool, optional
@@ -109,7 +111,8 @@ class BondoraApi:
         try:
             response = requests.get(self.url_api + '/{}'.format(url),
                                     headers=self.headers,
-                                    params=params)
+                                    params=params,
+                                    data=json.dumps(content))
 
             # check if response ok
             if response.status_code == requests.codes.ok:
@@ -144,7 +147,8 @@ class BondoraApi:
                 if retry:
                     # wait before proceed with the second attempt
                     time.sleep(wait_time)
-                    self.get(url, params=params)
+                    logger.info('Retry.')
+                    self.get(url, content=content, params=params)
 
         except Exception as e:
             logger.error(e)
@@ -324,8 +328,8 @@ class BondoraApi:
 
         """
         try:
-            json_ids = json.dumps({'ItemIds': ids})
-            loan_parts = self.post(self.url_loan_parts, content=json_ids)
+            loan_parts = self.get(self.url_loan_parts,
+                                  content={'ItemIds': ids})
             if 'Payload' not in loan_parts:
                 return None
             self.loan_parts = loan_parts['Payload']
