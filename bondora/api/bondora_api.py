@@ -7,7 +7,6 @@ import requests
 import urllib3
 import inspect
 import api.urls
-from datetime import date, datetime, timedelta
 from setup_logger import logger
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -80,6 +79,14 @@ class BondoraApi:
             response = requests.post(self.url_api + '/{}'.format(url),
                                      headers=self.headers,
                                      data=json.dumps(content))
+
+            # check if response is not ok
+            if response.status_code not in [requests.codes.ok, 202]:
+                # get caller name
+                caller = inspect.stack()[1][3]
+                logger.error('Response status code: {}, caller: {}'
+                             .format(response.status_code, caller))
+
         except Exception as e:
             logger.error(e)
 
@@ -98,7 +105,7 @@ class BondoraApi:
         params : dict, optional
             Parameters to pass in URL. The default is None.
         retry : bool, optional
-            Retry to execute the method, if too many requests.
+            Retry to execute the method.
             The default is False.
 
         Returns
@@ -162,7 +169,7 @@ class BondoraApi:
         Parameters
         ----------
         retry : bool
-            Retry to execute the method, if too many requests.
+            Retry to execute the method.
 
         Returns
         -------
@@ -184,7 +191,7 @@ class BondoraApi:
         Parameters
         ----------
         retry : bool
-            Retry to execute the method, if too many requests.
+            Retry to execute the method.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -211,7 +218,7 @@ class BondoraApi:
         Parameters
         ----------
         retry : bool
-            Retry to execute the method, if too many requests.
+            Retry to execute the method.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -237,7 +244,7 @@ class BondoraApi:
         Parameters
         ----------
         retry : bool
-            Retry to execute the method, if too many requests.
+            Retry to execute the method.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -294,7 +301,7 @@ class BondoraApi:
         Parameters
         ----------
         retry : bool
-            Retry to execute the method, if too many requests.
+            Retry to execute the method.
         **kwargs : dict
             Keyword arguments:
                 Request information (see
@@ -313,12 +320,14 @@ class BondoraApi:
         except Exception as e:
             logger.error(e)
 
-    def get_loanparts(self, ids):
+    def get_loanparts(self, retry, ids):
         """
         Get loan part info.
 
         Parameters
         ----------
+        retry : bool
+            Retry to execute the method.
         ids : list
             List of loan part IDs.
 
@@ -329,7 +338,8 @@ class BondoraApi:
         """
         try:
             loan_parts = self.get(self.url_loan_parts,
-                                  content={'ItemIds': ids})
+                                  content={'ItemIds': ids},
+                                  retry=retry)
             if 'Payload' not in loan_parts:
                 return None
             self.loan_parts = loan_parts['Payload']
