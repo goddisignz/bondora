@@ -198,8 +198,7 @@ class BondoraTrading(BondoraApi):
         Parameters
         ----------
         retry : bool, optional
-            Retry to execute the method, if too many requests.
-            The default is False.
+            Retry to execute the method. The default is False.
         **kwargs : dict
             Keyword arguments:
                 Loans conditions to cancel.
@@ -273,8 +272,7 @@ class BondoraTrading(BondoraApi):
             Latest selling date of loans before the next payment.
             The default is 2.
         retry : bool, optional
-            Retry to execute the method, if too many requests.
-            The default is False.
+            Retry to execute the method. The default is False.
         **kwargs : dict
             Keyword arguments:
                 Loans conditions to select for selling.
@@ -337,5 +335,23 @@ class BondoraTrading(BondoraApi):
                                 .format(len(part_ids_prices)))
 
             else:
+                if retry:
+                    # set waite time to 60 s.
+                    wait_time = 60
+                    # wait before proceed with the second attempt
+                    time.sleep(wait_time)
+                    logger.info('Retry.')
+                    response = self.sell_on_secondarymarket(part_ids_prices)
+                    if response.status_code == 202:
+                        if len(part_ids_prices) == 1:
+                            logger.info('1 loan was successfully put on '
+                                        'secondary market for selling.')
+                        else:
+                            logger.info(' {} loans were successfully put on '
+                                        'secondary market for selling.'
+                                        .format(len(part_ids_prices)))
+                        return None
+
                 logger.error('Error by putting loans on secondary market. '
-                             'Error code: {}'.format(response.status_code))
+                             'Error code: {}'
+                             .format(response.status_code))
