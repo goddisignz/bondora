@@ -331,6 +331,9 @@ class BondoraTrading(BondoraApi):
         None.
 
         """
+        # wait 60 seconds before proceed
+        time.sleep(60)
+
         price = max_price
         self.get_investments(retry, **kwargs)
 
