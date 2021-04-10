@@ -23,6 +23,9 @@ The project is organized as follows:
 ├── settings.cfg
 └── setup_logger.py
 ```
+* The folder `api` contains a low-level Python wrapper of the official Bondora API:
+  * `bondora_api.py` - Python wrapper class
+  * `urls.py` - collection of API endpoints
 
 ## Important Risk Disclosure
 Any investment carries the risk of a total loss of the invested amount or even to additional payments. Therefore, it is not suitable for everyone. Any decision for a particular investment should be based solely on your own trading objectives. The usage of this trading system is at your own risk!
