@@ -96,11 +96,11 @@ class BondoraTrading(BondoraApi):
             # check buying conditions
             today = datetime.now()
             next_pm_date = date.fromisoformat(payload['NextPaymentDate'][:10])
-            pm_date_min = (today + timedelta(days=10)).date()
+            pm_date_min = (today + timedelta(days=7)).date()
             loan_selector = (
                 payload['NextPaymentNr'] == 1
                 and
-                payload['DesiredDiscountRate'] <= 1.0
+                payload['DesiredDiscountRate'] <= 2.0
                 and
                 payload['LoanStatusCode'] == 2
                 and
@@ -151,7 +151,8 @@ class BondoraTrading(BondoraApi):
         None.
 
         """
-        loan_selector = False
+        loan_selector_1 = False
+        loan_selector_2 = False
         try:
             # get payload
             if 'EventType' not in loan:
@@ -163,21 +164,69 @@ class BondoraTrading(BondoraApi):
                 else:
                     payload = loan['Payload']
 
-            # check buying conditions
-            loan_selector = (
+            today = datetime.now()
+            # check buying conditions 1
+            loan_selector_1 = (
                 payload['DesiredDiscountRate'] <= -94.0
                 and
                 payload['Price'] <= 5.0
                 )
 
-            if loan_selector:
+            if loan_selector_1:
                 self.buy_on_secondarymarket([payload['Id']])
-                today = datetime.now()
                 with open(PATH_DATA + '/buy_red_{}.log'.format(
                         self.user[0:5]), 'a') as outfile:
                     outfile.write(
                         (today + timedelta(seconds=0*60*60)
                          ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
+                        'with with discount at least 94% ' +
+                        str(payload['Price']) +
+                        ' EUR in ' + payload['LoanPartId'] +
+                        ' on the secondary market with discount ' +
+                        str(payload['DesiredDiscountRate']) + '\n')
+                return None
+
+            # check buying conditions 2
+            if payload['DesiredDiscountRate'] > -69.0:
+                return None
+            loan_selector_2 = (
+                # default at least 90 days ago
+                date.fromisoformat(payload['DebtOccuredOn'][:10]) <
+                (today - timedelta(days=90)).date()
+                and
+                # last payment after last event
+                date.fromisoformat(
+                    payload['DebtManagmentEvents'][1]['CreatedOn'][:10]) <
+                date.fromisoformat(payload['LoanTransfers'][-1]['Date'][:10])
+                and
+                # at leat 3 payment within last 90 days
+                date.fromisoformat(payload['LoanTransfers'][-1]['Date'][:10]) >
+                (today - timedelta(days=90)).date()
+                and
+                date.fromisoformat(payload['LoanTransfers'][-2]['Date'][:10]) >
+                (today - timedelta(days=90)).date()
+                and
+                date.fromisoformat(payload['LoanTransfers'][-3]['Date'][:10]) >
+                (today - timedelta(days=90)).date()
+                and
+                # payment p.M. is larger than 19%
+                ((payload['LoanTransfers'][-1]['TotalAmount'] +
+                  payload['LoanTransfers'][-2]['TotalAmount'] +
+                  payload['LoanTransfers'][-3]['TotalAmount']) * 4.0 /
+                 (payload['PrincipalRemaining'] *
+                  (1.0 + payload['DesiredDiscountRate'] / 100.0))) > 19.0
+                and
+                payload['Price'] <= 5.0
+                )
+
+            if loan_selector_2:
+                self.buy_on_secondarymarket([payload['Id']])
+                with open(PATH_DATA + '/buy_red_{}.log'.format(
+                        self.user[0:5]), 'a') as outfile:
+                    outfile.write(
+                        (today + timedelta(seconds=0*60*60)
+                         ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
+                        'with with discount at least 69% ' +
                         str(payload['Price']) +
                         ' EUR in ' + payload['LoanPartId'] +
                         ' on the secondary market with discount ' +
@@ -282,9 +331,6 @@ class BondoraTrading(BondoraApi):
         None.
 
         """
-        # wait 1 second before proceed
-        time.sleep(1)
-
         price = max_price
         self.get_investments(retry, **kwargs)
 
@@ -340,7 +386,7 @@ class BondoraTrading(BondoraApi):
                     wait_time = 60
                     # wait before proceed with the second attempt
                     time.sleep(wait_time)
-                    logger.info('Retry.')
+                    logger.info('Retry selling.')
                     response = self.sell_on_secondarymarket(part_ids_prices)
                     if response.status_code == 202:
                         if len(part_ids_prices) == 1:
