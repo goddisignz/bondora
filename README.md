@@ -1,4 +1,4 @@
-# bondora
+# Bondora
 Trading on [Bondora](https://www.bondora.com/en) marketplace including API, webhooks listener, and analytics.
 Bondora as a leading Estonian marketplace for peer-to-peer consumer lending has a well-established secondary market and provides historical data on all secondary market transactions in a transparent way.
 
