@@ -45,7 +45,7 @@ The project is organized as follows:
 
 ### Functionality
 #### API
-The following resources of the official Bondora API are currently implemented in `./api/bondora_api.py`:
+The following resources of the official Bondora API are currently implemented in **BondoraApi** class at `./api/bondora_api.py`:
 | API Endpoint | Method | Description |
 | ------------ | ------------ | ------------ |
 | GET [api/v1/account/balance](https://api.bondora.com/doc/Api/GET-api-v1-account-balance?v=1) | get_balance | Get account balance information |
