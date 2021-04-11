@@ -49,6 +49,15 @@ The following resources of the official Bondora API are currently implemented in
 | API Endpoint | Method | Description |
 | ------------ | ------------ | ------------ |
 | GET [api/v1/account/balance](https://api.bondora.com/doc/Api/GET-api-v1-account-balance?v=1) | get_balance | Get account balance information |
+| GET [api/v1/account/investments](https://api.bondora.com/doc/Api/GET-api-v1-account-investments?v=1) | get_investments | Get list of investments |
+| GET [api/v1/eventlog](https://api.bondora.com/doc/Api/GET-api-v1-eventlog?v=1) | get_eventlog | Get events that have been made with this application |
+| GET [api/v1/auctions](https://api.bondora.com/doc/Api/GET-api-v1-auctions?v=1) | get_auctions | Get list of active auctions |
+| POST [api/v1/bid](https://api.bondora.com/doc/Api/POST-api-v1-bid?v=1) | bid_on_auction | Make bid into auctions by auction IDs |
+| GET [api/v1/secondarymarket](https://api.bondora.com/doc/Api/GET-api-v1-secondarymarket?v=1) | get_secondarymarket | Get list of active secondary market items |
+| GET [api/v1/loanpart/list](https://api.bondora.com/doc/Api/GET-api-v1-loanpart-list?v=1) | get_loanparts | Get loan part info |
+| POST [api/v1/secondarymarket/buy](https://api.bondora.com/doc/Api/POST-api-v1-secondarymarket-buy?v=1) | buy_on_secondarymarket | Buy loans from secondary market by loans IDs |
+| POST [api/v1/secondarymarket/sell](https://api.bondora.com/doc/Api/POST-api-v1-secondarymarket-sell?v=1) | sell_on_secondarymarket | Sell loans on secondary market |
+| POST [api/v1/secondarymarket/cancel](https://api.bondora.com/doc/Api/POST-api-v1-secondarymarket-cancel?v=1) | cancel_on_secondarymarket | Cancel sale of loans offered on secondary market |
 
 #### Trading
 TO DO
