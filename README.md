@@ -35,9 +35,9 @@ The project is organized as follows:
   * `offer_red_loans.py` - how to offer defaulted (red) loans for selling on the secondary market
   * `reset_webhooks.py` - how to unblock a webhook endpoint, if it has been blocked by Bondora. Bondora blocs a webhook endpoint after generating 25 errors as a response to the POST request.
 * The folder `hooks` contains functionality required for receiving and proceeding webhook notifications from Bondora:
-  * `application.py` - TO DO
-  * `hooks.wsgi` - TO DO
-  * `listener.py` - TO DO
+  * `application.py` - Python class to communicate with the Bondora API web interface.
+  * `hooks.wsgi` - *mod_wsgi* application file
+  * `listener.py` - webhook listener
 *  The folder `trading` contains high-level Python class for communication with the official Bondora API:
   * `bondora_trading.py` - TO DO
 * `settings.cfg` - project settings file
