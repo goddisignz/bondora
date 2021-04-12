@@ -61,7 +61,14 @@ The following resources of the official Bondora API are currently implemented in
 | POST [api/v1/secondarymarket/cancel](https://api.bondora.com/doc/Api/POST-api-v1-secondarymarket-cancel?v=1) | cancel_on_secondarymarket | Cancel sale of loans offered on secondary market |
 
 #### Trading
-TO DO
+| Method | Description |
+| ------------ | ------------ |
+| bid_loan |  |
+| buy_green_loan |  |
+| buy_red_loan |  |
+| cancel_sm_offers |  |
+| place_sm_offers |  |
+
 
 #### Hooks
 TO DO
