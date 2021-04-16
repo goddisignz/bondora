@@ -397,10 +397,13 @@ class BondoraApi:
             for loan in loans:
                 loans_ids_list.append({'LoanPartId': loan[0],
                                        'DesiredDiscountRate': loan[1]})
-            loans_dict = {'Items': loans_ids_list,
-                          'CancelItemOnPaymentReceived': cancel_on_payment,
-                          'CancelItemOnReschedule': cancel_on_reschedule}
-            response = self.post(self.url_sell_sm, loans_dict)
+
+            # split loans_ids_list chunks of size 100 to avoid error by selling
+            for i in range(0, len(loans_ids_list), 100):
+                loans_dict = {'Items': loans_ids_list[i:i + 100],
+                              'CancelItemOnPaymentReceived': cancel_on_payment,
+                              'CancelItemOnReschedule': cancel_on_reschedule}
+                response = self.post(self.url_sell_sm, loans_dict)
             return response
 
         except Exception as e:
