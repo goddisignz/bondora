@@ -425,7 +425,10 @@ class BondoraApi:
 
         """
         try:
-            response = self.post(self.url_cancel_sm, {'ItemIds': ids})
+            # split ids chunks of size 100 to avoid error by cancelling
+            for i in range(0, len(ids), 100):
+                response = self.post(self.url_cancel_sm,
+                                     {'ItemIds': ids[i:i + 100]})
             return response
 
         except Exception as e:
