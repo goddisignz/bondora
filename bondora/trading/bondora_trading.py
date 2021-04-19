@@ -123,15 +123,15 @@ class BondoraTrading(BondoraApi):
 
             if loan_selector:
                 self.buy_on_secondarymarket([payload['Id']])
-                with open(PATH_DATA + '/buy_green_{}.log'.format(
-                        self.user[0:5]), 'a') as outfile:
-                    outfile.write(
-                        (today + timedelta(seconds=0*60*60)
-                         ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
-                        str(payload['Price']) +
-                        ' EUR in ' + payload['LoanPartId'] +
-                        ' on the secondary market with discount ' +
-                        str(payload['DesiredDiscountRate']) + '\n')
+                #with open(PATH_DATA + '/buy_green_{}.log'.format(
+                #        self.user[0:5]), 'a') as outfile:
+                #    outfile.write(
+                #        (today + timedelta(seconds=0*60*60)
+                #         ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
+                #        str(payload['Price']) +
+                #        ' EUR in ' + payload['LoanPartId'] +
+                #        ' on the secondary market with discount ' +
+                #        str(payload['DesiredDiscountRate']) + '\n')
 
         except Exception as e:
             #logger.error(e)
@@ -174,16 +174,16 @@ class BondoraTrading(BondoraApi):
 
             if loan_selector_1:
                 self.buy_on_secondarymarket([payload['Id']])
-                with open(PATH_DATA + '/buy_red_{}.log'.format(
-                        self.user[0:5]), 'a') as outfile:
-                    outfile.write(
-                        (today + timedelta(seconds=0*60*60)
-                         ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
-                        'with with discount at least 94% ' +
-                        str(payload['Price']) +
-                        ' EUR in ' + payload['LoanPartId'] +
-                        ' on the secondary market with discount ' +
-                        str(payload['DesiredDiscountRate']) + '\n')
+                #with open(PATH_DATA + '/buy_red_{}.log'.format(
+                #        self.user[0:5]), 'a') as outfile:
+                #    outfile.write(
+                #        (today + timedelta(seconds=0*60*60)
+                #         ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
+                #        'with with discount at least 94% ' +
+                #        str(payload['Price']) +
+                #        ' EUR in ' + payload['LoanPartId'] +
+                #        ' on the secondary market with discount ' +
+                #        str(payload['DesiredDiscountRate']) + '\n')
                 return None
 
             # check buying conditions 2
@@ -209,28 +209,36 @@ class BondoraTrading(BondoraApi):
                 date.fromisoformat(payload['LoanTransfers'][-3]['Date'][:10]) >
                 (today - timedelta(days=90)).date()
                 and
-                # payment p.M. is larger than 19%
-                ((payload['LoanTransfers'][-1]['TotalAmount'] +
-                  payload['LoanTransfers'][-2]['TotalAmount'] +
-                  payload['LoanTransfers'][-3]['TotalAmount']) * 4.0 /
+                # payment p.a. is larger than 19% (last payment)
+                (12.0 * payload['LoanTransfers'][-1]['TotalAmount'] /
                  (payload['PrincipalRemaining'] *
-                  (1.0 + payload['DesiredDiscountRate'] / 100.0))) > 19.0
+                  (1.0 + payload['DesiredDiscountRate'] / 100.0))) > 0.19
+                and
+                # payment p.a. is larger than 19% (second last payment)
+                (12.0 * payload['LoanTransfers'][-2]['TotalAmount'] /
+                 (payload['PrincipalRemaining'] *
+                  (1.0 + payload['DesiredDiscountRate'] / 100.0))) > 0.19
+                and
+                # payment p.a. is larger than 19% (third last payment)
+                (12.0 * payload['LoanTransfers'][-3]['TotalAmount'] /
+                 (payload['PrincipalRemaining'] *
+                  (1.0 + payload['DesiredDiscountRate'] / 100.0))) > 0.19
                 and
                 payload['Price'] <= 5.0
                 )
 
             if loan_selector_2:
                 self.buy_on_secondarymarket([payload['Id']])
-                with open(PATH_DATA + '/buy_red_{}.log'.format(
-                        self.user[0:5]), 'a') as outfile:
-                    outfile.write(
-                        (today + timedelta(seconds=0*60*60)
-                         ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
-                        'with with discount at least 69% ' +
-                        str(payload['Price']) +
-                        ' EUR in ' + payload['LoanPartId'] +
-                        ' on the secondary market with discount ' +
-                        str(payload['DesiredDiscountRate']) + '\n')
+                #with open(PATH_DATA + '/buy_red_{}.log'.format(
+                #        self.user[0:5]), 'a') as outfile:
+                #    outfile.write(
+                #        (today + timedelta(seconds=0*60*60)
+                #         ).strftime('%d.%m.%Y %H:%M:%S') + ': Try to invest ' +
+                #        'with with discount at least 69% ' +
+                #        str(payload['Price']) +
+                #        ' EUR in ' + payload['LoanPartId'] +
+                #        ' on the secondary market with discount ' +
+                #        str(payload['DesiredDiscountRate']) + '\n')
 
         except Exception as e:
             #logger.error(e)
