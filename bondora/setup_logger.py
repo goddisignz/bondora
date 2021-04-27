@@ -6,6 +6,7 @@ import logging
 
 PATH_LOGS = '/var/www/flask/bondora/bondora.log'
 
+
 class Logger():
     """Logger class."""
 
