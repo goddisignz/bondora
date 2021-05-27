@@ -63,11 +63,11 @@ The following resources of the official Bondora API are currently implemented in
 #### Trading
 | Method | Description |
 | ------------ | ------------ |
-| bid_loan |  |
-| buy_green_loan |  |
-| buy_red_loan |  |
-| cancel_sm_offers |  |
-| place_sm_offers |  |
+| bid_loan | Make bid into specified auction |
+| buy_green_loan | Buy green loan on secondary market, if buying conditions are satisfied |
+| buy_red_loan | Buy red loan on secondary market, if buying conditions are satisfied |
+| cancel_sm_offers | Cancel selling of own loans offered on secondary market |
+| place_sm_offers | Place loans for selling on secondary market |
 
 
 #### Hooks
