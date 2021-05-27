@@ -76,7 +76,9 @@ TO DO
 
 #### Examples
 ##### `offer_green_loans.py`
+Example how to offer for selling current (green) loans on bondora's secondary market. The loans are initially offered with a max_price (gain of 5% in this example). If a min_price (0% in this example) is provided, the selling price will be reduced daily by 1% to reach the min_price two day before the next planned payment. Bondora token must be provided in `settings.cfg` to run this example.
 ##### `offer_red_loans.py`
+Example how to offer for selling defaulted (red) loans on bondora's secondary market. Only the defaulted loans without any payments within last 12 months and with the latest debt management stage type of write off will be offered with a discount of -80%. Bondora token must be provided in `settings.cfg` to run this example.
 ##### `reset_webhooks.py`
 Example how to reset webhook errors via web interface, if the current number of errors is above the threshold (5 in this example). It can be used to unblock a webhook endpoint. Bondora username, password, and application ID must be provided in `settings.cfg` to run this example.
 
