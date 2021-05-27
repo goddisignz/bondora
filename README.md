@@ -72,15 +72,25 @@ The following high-level trading methods are currently implemented in **BondoraT
 
 
 #### Hooks
-TO DO
+##### `listener.py`
+Listen to webhooks and execute the methods buy_red_loan and buy_green_loan from the **BondoraTrading** class.
+##### `application.py`
+The following methods are currently implemented:
+| Method | Description |
+| ------------ | ------------ |
+| get_webhooks | Log into Bondora's API web interface and get list of webhooks |
+| reset_webhooks | Reset webhooks, if the number of failures are above threshold |
 
 #### Examples
 ##### `offer_green_loans.py`
-Example how to offer for selling current (green) loans on bondora's secondary market. The loans are initially offered with a max_price (gain of 5% in this example). If a min_price (0% in this example) is provided, the selling price will be reduced daily by 1% to reach the min_price two day before the next planned payment. Bondora token must be provided in `settings.cfg` to run this example.
+Example how to offer for selling current (green) loans on bondora's secondary market. The loans are initially offered with a max_price (gain of 5% in this example). If a min_price (0% in this example) is provided, the selling price will be reduced daily by 1% to reach the min_price two day before the next planned payment.
+Bondora token must be provided in `settings.cfg` to run this example.
 ##### `offer_red_loans.py`
-Example how to offer for selling defaulted (red) loans on bondora's secondary market. Only the defaulted loans without any payments within last 12 months and with the latest debt management stage type of write off will be offered with a discount of -80%. Bondora token must be provided in `settings.cfg` to run this example.
+Example how to offer for selling defaulted (red) loans on bondora's secondary market. Only the defaulted loans without any payments within last 12 months and with the latest debt management stage type of write off will be offered with a discount of -80%.
+Bondora token must be provided in `settings.cfg` to run this example.
 ##### `reset_webhooks.py`
-Example how to reset webhook errors via web interface, if the current number of errors is above the threshold (5 in this example). It can be used to unblock a webhook endpoint. Bondora username, password, and application ID must be provided in `settings.cfg` to run this example.
+Example how to reset webhook errors via web interface, if the current number of errors is above the threshold (5 in this example). It can be used to unblock a webhook endpoint.
+Bondora username, password, and application ID must be provided in `settings.cfg` to run this example.
 
 ## Important Risk Disclosure
 Any investment carries the risk of a total loss of the invested amount or even to additional payments. Therefore, it is not suitable for everyone. Any decision for a particular investment should be based solely on your own trading objectives. The usage of this trading system is at your own risk!
