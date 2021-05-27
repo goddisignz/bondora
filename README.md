@@ -78,7 +78,7 @@ TO DO
 ##### `offer_green_loans.py`
 ##### `offer_red_loans.py`
 ##### `reset_webhooks.py`
-
+Example how to reset webhook errors via web interface, if the current number of errors is above the threshold (5 in this example). It can be used to unblock a webhook endpoint. Bondora username, password, and application ID must be provided in `settings.cfg` to run this example.
 
 ## Important Risk Disclosure
 Any investment carries the risk of a total loss of the invested amount or even to additional payments. Therefore, it is not suitable for everyone. Any decision for a particular investment should be based solely on your own trading objectives. The usage of this trading system is at your own risk!
