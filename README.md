@@ -75,7 +75,10 @@ The following high-level trading methods are currently implemented in **BondoraT
 TO DO
 
 #### Examples
-TO DO
+##### `offer_green_loans.py`
+##### `offer_red_loans.py`
+##### `reset_webhooks.py`
+
 
 ## Important Risk Disclosure
 Any investment carries the risk of a total loss of the invested amount or even to additional payments. Therefore, it is not suitable for everyone. Any decision for a particular investment should be based solely on your own trading objectives. The usage of this trading system is at your own risk!
