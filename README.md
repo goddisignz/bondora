@@ -61,6 +61,7 @@ The following resources of the official Bondora API are currently implemented in
 | POST [api/v1/secondarymarket/cancel](https://api.bondora.com/doc/Api/POST-api-v1-secondarymarket-cancel?v=1) | cancel_on_secondarymarket | Cancel sale of loans offered on secondary market |
 
 #### Trading
+The following high-level trading methods are currently implemented in **BondoraTrading** class at `./trading/bondora_trading.py`:
 | Method | Description |
 | ------------ | ------------ |
 | bid_loan | Make bid into specified auction |
