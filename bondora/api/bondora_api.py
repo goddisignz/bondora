@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """The file contains the class definition of Bondora API."""
 
+import sys
 import json
 import time
 import requests
@@ -23,6 +24,7 @@ class BondoraApi:
                  url_eventlog=api.urls.URL_BONDORA_EVENTLOG,
                  url_auctions=api.urls.URL_BONDORA_AUCTIONS,
                  url_bid_auction=api.urls.URL_BONDORA_BID_AUCTION,
+                 url_get_bid=api.urls.URL_BONDORA_GET_BID,
                  url_sm=api.urls.URL_BONDORA_SM,
                  url_loan_parts=api.urls.URL_LOAN_PARTS,
                  url_buy_sm=api.urls.URL_BONDORA_BUY_SM,
@@ -35,6 +37,7 @@ class BondoraApi:
         self.url_eventlog = url_eventlog
         self.url_auctions = url_auctions
         self.url_bid_auction = url_bid_auction
+        self.url_get_bid = url_get_bid
         self.url_sm = url_sm
         self.url_loan_parts = url_loan_parts
         self.url_buy_sm = url_buy_sm
@@ -289,6 +292,28 @@ class BondoraApi:
                                           'MinAmount': 1})
             response = self.post(self.url_bid_auction, {'Bids':
                                                         auctions_ids_list})
+            return response
+
+        except Exception as e:
+            logger.error(e)
+
+    def get_bid(self, id, retry):
+        """
+        Get status of bid.
+
+        Parameters
+        ----------
+        id : String
+            Bid Id.
+
+        Returns
+        -------
+        response : requests.Response object
+            Response of server to the request.
+
+        """
+        try:
+            response = self.get(self.url_get_bid + "/" + id, retry=retry)
             return response
 
         except Exception as e:
