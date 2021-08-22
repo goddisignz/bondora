@@ -297,6 +297,26 @@ class BondoraApi:
         except Exception as e:
             logger.error(e)
 
+    def get_bids(self, retry):
+        """
+        Gets list of bids the investor has made..
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        response : requests.Response object
+            Response of server to the request.
+
+        """
+        try:
+            response = self.get(self.url_get_bids, retry=retry)
+            return response
+
+        except Exception as e:
+            logger.error(e)
+
     def get_bid(self, id, retry):
         """
         Get status of bid.

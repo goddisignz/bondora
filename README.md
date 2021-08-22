@@ -54,6 +54,7 @@ The following resources of the official Bondora API are currently implemented in
 | GET [api/v1/eventlog](https://api.bondora.com/doc/Api/GET-api-v1-eventlog?v=1) | get_eventlog | Get events that have been made with this application |
 | GET [api/v1/auctions](https://api.bondora.com/doc/Api/GET-api-v1-auctions?v=1) | get_auctions | Get list of active auctions |
 | POST [api/v1/bid](https://api.bondora.com/doc/Api/POST-api-v1-bid?v=1) | bid_on_auction | Make bid into auctions |
+| GET [api/v1/bids](https://api.bondora.com/doc/Api/GET-api-v1-bids?v=1) | get_bids | Get users' current bids |
 | GET [api/v1/bid/{Id}](https://api.bondora.com/doc/Api/GET-api-v1-bid-id?v=1) | get_bid | Get status of bid |
 | GET [api/v1/secondarymarket](https://api.bondora.com/doc/Api/GET-api-v1-secondarymarket?v=1) | get_secondarymarket | Get list of active secondary market items |
 | GET [api/v1/loanpart/list](https://api.bondora.com/doc/Api/GET-api-v1-loanpart-list?v=1) | get_loanparts | Get loan part info |
